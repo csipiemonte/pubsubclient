@@ -11,8 +11,11 @@
 #include "Client.h"
 #include "Stream.h"
 
+// Max write length
+#define MAX_WRITE_LENGTH 90
+
 // MQTT_MAX_PACKET_SIZE : Maximum packet size
-#define MQTT_MAX_PACKET_SIZE 128
+#define MQTT_MAX_PACKET_SIZE 512
 
 // MQTT_KEEPALIVE : keepAlive interval in Seconds
 #define MQTT_KEEPALIVE 15
@@ -41,6 +44,8 @@
 class PubSubClient {
 private:
    Client* _client;
+   uint8_t *ip;
+   char* domain;
    uint8_t buffer[MQTT_MAX_PACKET_SIZE];
    uint16_t nextMsgId;
    unsigned long lastOutActivity;
@@ -51,8 +56,6 @@ private:
    uint8_t readByte();
    boolean write(uint8_t header, uint8_t* buf, uint16_t length);
    uint16_t writeString(char* string, uint8_t* buf, uint16_t pos);
-   uint8_t *ip;
-   char* domain;
    uint16_t port;
    Stream* stream;
 public:

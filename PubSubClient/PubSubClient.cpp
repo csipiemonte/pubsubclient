@@ -327,7 +327,7 @@ boolean PubSubClient::publish_P(char* topic, uint8_t* PROGMEM payload, unsigned 
 }
 
 boolean PubSubClient::write(uint8_t header, uint8_t* buf, uint16_t length) {
-   uint8_t lenBuf[4];
+   uint8_t lenBuf[4] = {0};
    uint8_t llen = 0;
    uint8_t digit;
    uint8_t pos = 0;
@@ -347,10 +347,26 @@ boolean PubSubClient::write(uint8_t header, uint8_t* buf, uint16_t length) {
    for (int i=0;i<llen;i++) {
       buf[5-llen+i] = lenBuf[i];
    }
-   rc = _client->write(buf+(4-llen),length+1+llen);
+
+   int nw = length+1+llen;
+   int rctot = 0;
+   uint8_t *bufferSend = buf+(4-llen);
+
+   while ( rctot < nw)
+   {
+	   int npart = nw - rctot;
+	   int nwrite =  (npart>MAX_WRITE_LENGTH)?MAX_WRITE_LENGTH:npart;
+	   rc = _client->write(bufferSend,nwrite);
+	   if (rc < nwrite)
+		   return false;
+
+	   rctot += nwrite;
+	   bufferSend += nwrite;
+   }
+   //rc = _client->write(buf+(4-llen),length+1+llen);
    
    lastOutActivity = millis();
-   return (rc == 1+llen+length);
+   return rctot == nw;
 }
 
 boolean PubSubClient::subscribe(char* topic) {
@@ -420,7 +436,10 @@ boolean PubSubClient::connected() {
       rc = false;
    } else {
       rc = (int)_client->connected();
-      if (!rc) _client->stop();
+      if (!rc)
+      {
+    	  //_client->stop();
+      }
    }
    return rc;
 }

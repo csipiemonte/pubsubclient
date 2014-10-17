@@ -408,11 +408,24 @@ boolean PubSubClient::unsubscribe(char* topic) {
    return false;
 }
 
+void PubSubClient::closeConnection()
+{
+  while (_client->available())
+  {
+    char c = _client->read();
+  }
+  _client->flush();
+  _client->stop();
+}
+
 void PubSubClient::disconnect() {
    buffer[0] = MQTTDISCONNECT;
    buffer[1] = 0;
    _client->write(buffer,2);
-   _client->stop();
+
+   closeConnection();
+
+   //_client->stop();
    lastInActivity = lastOutActivity = millis();
 }
 

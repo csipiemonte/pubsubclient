@@ -78,6 +78,7 @@ public:
    boolean unsubscribe(char *);
    boolean loop();
    boolean connected();
+   void closeConnection();
 };
 
 

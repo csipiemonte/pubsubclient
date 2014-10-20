@@ -198,7 +198,8 @@ boolean PubSubClient::loop() {
       unsigned long t = millis();
       if ((t - lastInActivity > MQTT_KEEPALIVE*1000UL) || (t - lastOutActivity > MQTT_KEEPALIVE*1000UL)) {
          if (pingOutstanding) {
-            _client->stop();
+           closeConnection();
+            //_client->stop();
             return false;
          } else {
             buffer[0] = MQTTPINGREQ;

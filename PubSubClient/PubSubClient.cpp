@@ -118,7 +118,8 @@ boolean PubSubClient::connect(char *id, char *user, char *pass, char* willTopic,
          while (!_client->available()) {
             unsigned long t = millis();
             if (t-lastInActivity > MQTT_KEEPALIVE*1000UL) {
-               _client->stop();
+               closeConnection();
+               //_client->stop();
                return false;
             }
          }
@@ -131,7 +132,8 @@ boolean PubSubClient::connect(char *id, char *user, char *pass, char* willTopic,
             return true;
          }
       }
-      _client->stop();
+      closeConnection();
+      //_client->stop();
    }
    return false;
 }
